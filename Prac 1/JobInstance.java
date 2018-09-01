@@ -24,7 +24,8 @@ public class JobInstance extends Job{
 			temp_output = new String(this.output);
 			this.output = null;
 		}
-		
+
+
 		return temp_output;
 	}
 }

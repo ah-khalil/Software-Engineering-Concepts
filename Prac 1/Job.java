@@ -2,7 +2,6 @@ import java.io.*;
 
 public abstract class Job implements Runnable{
 	protected String name;
-	protected String output;
 	protected long interval;
 	protected long last_run_time = System.currentTimeMillis() / 1000;
 

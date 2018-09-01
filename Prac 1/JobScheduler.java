@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.ArrayList;
 
 public class JobScheduler{
@@ -15,15 +16,10 @@ public class JobScheduler{
 	private final boolean JOB_TEST = true;
 	private final long JOB_TEST_IV = 2;
 
-	public static void main(String[] args){
-		Job job;
-		long start_time;
-		long prevs_time = -1;
-		long currn_time;
-		String job_output;
+	public static void main(String[] args) throws IOException{
+		Timer task = new Timer();
 		JobScheduler job_sch = new JobScheduler();
 
-		start_time = System.currentTimeMillis();
 		job_sch.job_arrlist = new ArrayList<Job>();
 		job_sch.log_arrlist = new ArrayList<String>();
 		job_sch.sui_arrlist = new ArrayList<String>();
@@ -35,30 +31,32 @@ public class JobScheduler{
 		if (job_sch.JOB_TEST)
 			job_sch.job_arrlist.add(new JobInstance(job_sch.JOB_TEST_IV));
 
-		while(true){
-			for(int i = 0; i < job_sch.job_arrlist.size(); i++){
-				job = job_sch.job_arrlist.get(i);
-				job_output = job.get_output();
+		task.scheduleAtFixedRate(new TimerTask(){
+			@Override
+			public void run(){
+				Job job;
+				String output;
 
-				if(job_output != null){
-					synchronized(job_sch.mutex){
-						job_sch.log_arrlist.add(job_output);
-						job_sch.sui_arrlist.add(job_output);
+				for(int i = 0; i < job_sch.job_arrlist.size(); i++){
+					job = job_sch.job_arrlist.get(i);
+
+					if((output = job.get_output()) != null){
+						System.out.println("Getting Output from Job: " + job.get_name());
+
+						synchronized(job_sch.mutex){
+							job_sch.log_arrlist.add(output);
+							job_sch.sui_arrlist.add(output);
+						}
+					}
+
+					System.out.println((System.currentTimeMillis() / 1000) % job_sch.JOB_TEST_IV);
+
+					if((System.currentTimeMillis() / 1000) % job.get_interval() == 0){
+						new Thread(job).start();
 					}
 				}
-
-				currn_time = ((System.currentTimeMillis() - start_time) / 1000);
-
-				if(currn_time != prevs_time)
-					System.out.println(currn_time);
-
-				prevs_time = currn_time;
-
-				if((System.currentTimeMillis() / 1000) % job.get_interval() == 0){
-					job_sch.run_job(job);
-				}
 			}
-		}
+		}, 0, 1000);
 	}
 
 	public void run_ui(){
@@ -71,11 +69,11 @@ public class JobScheduler{
 					try{
 						synchronized(mutex){
 							for(int i = 0; i < sui_arrlist.size(); i++){
-								System.out.println(sui_arrlist.size());
-								System.out.println(sui_arrlist.remove(i));
+								sui_arrlist.remove(i);
+								// System.out.println("In Run_UI: " + sui_arrlist.size());
+								// System.out.println("In Run_UI: " + sui_arrlist.remove(i));
+								//print_ui();
 							}
-
-							print_ui();
 						}
 
 						Thread.sleep(500);
@@ -91,30 +89,27 @@ public class JobScheduler{
 		new Thread(new Runnable(){
 			@Override
 			public void run(){
-				try{
-					synchronized(mutex){
-						for(int i = 0; i < log_arrlist.size(); i++){
-							System.out.println(log_arrlist.size());
-							buff_w.write(log_arrlist.remove(i));
+
+				while(true){
+					try{
+						System.out.println("Size of Logger Array List: " + log_arrlist.size());
+						synchronized(mutex){
+							for(int i = 0; i < log_arrlist.size(); i++){
+								buff_w.write(log_arrlist.remove(i));
+							}
+							
+							buff_w.flush();
 						}
+
+						Thread.sleep(500);
+					} catch(InterruptedException int_e){
+						int_e.printStackTrace();
+					} catch(IOException ioe){
+						ioe.printStackTrace();
+					} finally{
+						// close_stream();
 					}
-
-					Thread.sleep(500);
-				} catch(InterruptedException int_e){
-					int_e.printStackTrace();
-				} catch(IOException ioe){
-					ioe.printStackTrace();
-					close_stream();
 				}
-			}
-		}).start();
-	}
-
-	public void run_job(Job job){
-		new Thread(new Runnable(){
-			@Override
-			public void run(){
-				job.run();
 			}
 		}).start();
 	}
@@ -132,6 +127,7 @@ public class JobScheduler{
 	public void close_stream(){
 		try{
 			buff_w.close();
+			fos.close();
 		} catch(IOException ioe){
 			ioe.printStackTrace();
 		} finally{
