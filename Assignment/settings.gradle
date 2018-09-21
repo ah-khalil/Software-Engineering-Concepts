@@ -1,0 +1,3 @@
+include 'core'
+include 'quiz-plugin'
+include 'question-type-plugin'
