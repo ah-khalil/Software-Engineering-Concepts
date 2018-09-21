@@ -1,13 +1,15 @@
 apply plugin: 'java'
 
-subprojects{
-	apply plugin: 'java'
+jar {
+    from configurations.runtime
+}
 
+dependencies{
+	compile project(':core')
+}
+
+subprojects{
 	repositories{
 		jcenter()
-	}
-
-	dependencies{
-		testCompile 'org.mockito:mockito-all:1.10.19'
 	}
 }
