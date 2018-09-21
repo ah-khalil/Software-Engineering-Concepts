@@ -1,0 +1,11 @@
+jar {
+	manifest {
+		attributes 'Main-Class', 'edu.curtin.quizapplication.QuizApplication'
+	}
+
+	from {
+		configurations.compile.collect{
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+}

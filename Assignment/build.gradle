@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+subprojects{
+	apply plugin: 'java'
+
+	repositories{
+		jcenter()
+	}
+
+	dependencies{
+		testCompile 'org.mockito:mockito-all:1.10.19'
+	}
+}
