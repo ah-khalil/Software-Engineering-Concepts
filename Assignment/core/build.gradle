@@ -1,11 +1,5 @@
-apply plugin: 'java'
-
 jar {
 	manifest {
 		attributes 'Main-Class' : 'com.haytham.quizapplication.QuizApplication'
-	}
-
-	from{
-		configurations.compile.collect{it.isDirectory() ? it : zipTree(it)}
 	}
 }
