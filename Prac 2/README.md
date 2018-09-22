@@ -3,7 +3,7 @@ FileSearcher
 
 (Part of worksheet 3 for COMP3003 Software Engineering Concepts)
 
-This is a simple (simplistic) Java and Swing-based file searching application. It works, but it's essentially single-threaded, with everything happening inside Swing's event-dispatch thread. Your task is to make it multithreaded, using a  blocking queue to arrange for thread communication.
+This is a simple (simplistic) Java and Swing-based file searching application. It works, but it's essentially single-threaded, with everything happening inside Swing's event-dispatch thread.
 
 Building and Running
 --------------------
