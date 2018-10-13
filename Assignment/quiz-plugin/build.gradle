@@ -1,0 +1,4 @@
+dependencies{
+	compile project(':multi-choice')
+	compile project(':short-answer')
+}
