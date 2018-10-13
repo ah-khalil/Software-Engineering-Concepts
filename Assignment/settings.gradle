@@ -1,1 +1,1 @@
-include 'core', 'short-answer', 'multi-choice', 'quiz-plugin'
+include 'core', 'ShortAnswer', 'MultiChoice', 'QuizPlugin'
