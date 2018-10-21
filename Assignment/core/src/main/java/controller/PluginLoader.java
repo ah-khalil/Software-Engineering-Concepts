@@ -16,7 +16,7 @@ public class PluginLoader extends ClassLoader{
 		try{
 			quiz_cl = Class.forName("model.Quiz");
 			q_pl_cl = Class.forName("model.QuestionTypePlugin");
-			cl_path = Paths.get(root_plugin_dir, "build", "classes", "java", "main");
+			cl_path = Paths.get(root_plugin_dir, "build", "classes", "main");
 			cl_file = cl_path.toFile();
 
 			for(File file_entry : cl_file.listFiles()){

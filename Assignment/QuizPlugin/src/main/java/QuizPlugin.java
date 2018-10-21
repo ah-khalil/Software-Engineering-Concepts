@@ -12,12 +12,19 @@ public class QuizPlugin extends Quiz{
 
 	public void run_quiz(PluginLoader plug_loader){
 		MultiChoiceQuestion mc_q, mc_q_two, mc_q_three;
+		ShortAnswerQuestion sh_q, sh_q_two, sh_q_three;
+
 		Future<Boolean> mc_q_result, mc_q_two_result, mc_q_three_result;
+		Future<Boolean> sh_q_result, sh_q_two_result, sh_q_three_result;
+
 		MultiChoice multichoice_plugin;
+		ShortAnswer shortanswer_plugin;
 
 		try{
 			multichoice_plugin = (MultiChoice) plug_loader.load("MultiChoice").newInstance();
+			shortanswer_plugin = (ShortAnswer) plug_loader.load("ShortAnswer").newInstance();
 			multichoice_plugin.set_controller(this.quiz_controller);
+			shortanswer_plugin.set_controller(this.quiz_controller);
 
 			mc_q = multichoice_plugin.create_multichoice(
 				"Which one of these is trash?",
@@ -53,9 +60,15 @@ public class QuizPlugin extends Quiz{
 				2
 			);
 
-			mc_q_result = mc_q.invoke();
-			mc_q_two_result = mc_q_two.invoke();
-			mc_q_three_result = mc_q_three.invoke();
+			sh_q = shortanswer_plugin.create_shortanswer(
+				"Who won the 2016 US Presidential Election?",
+				"Donald Trump"
+			);
+
+			mc_q_result = mc_q.invoke(10);
+			mc_q_two_result = mc_q_two.invoke(1);
+			mc_q_three_result = mc_q_three.invoke(1);
+			sh_q_result = sh_q.invoke(1);
 
 			if(!mc_q_result.get()){
 				System.out.println("You just got yote!");

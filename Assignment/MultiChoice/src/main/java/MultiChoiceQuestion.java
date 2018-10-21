@@ -20,14 +20,6 @@ public class MultiChoiceQuestion extends Question{
 		set_radio_buttons(options, option_answer_idx);
 	}
 
-	public Future<Boolean> invoke(){
-		return invoke(-1);
-	}
-
-	public Future<Boolean> invoke(int time){
-		return this.quiz_controller.add_task(this, time);
-	}
-
 	public Boolean check_answer(){
 		return (this.given_answer.equals(this.actual_answer));
 	}

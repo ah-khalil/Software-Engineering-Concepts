@@ -35,7 +35,7 @@ public class QuizApplication{
 				question_type_b_list = new LinkedBlockingQueue<Question>();
 
 				loader = new PluginLoader();
-				plugin_cl = loader.load("QuizPlugin");
+				plugin_cl = loader.load(args[0]);
 				loader_cl = Class.forName("controller.PluginLoader");
 				control_cl = Class.forName("controller.QuizController");
 				test_control = new QuizController(question_type_b_list, monitor);

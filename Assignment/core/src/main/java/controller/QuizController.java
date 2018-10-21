@@ -13,7 +13,6 @@ public class QuizController{
 
 	private Object monitor;
 	private QuizWindow quiz_w;
-	private boolean toggling_bool = true;
 	private ExecutorService exec_service;
 	private LinkedBlockingQueue<Question> question_type_b_list;	
 
@@ -27,14 +26,18 @@ public class QuizController{
 		this.quiz_w = quiz_window;
 	}
 
-	public Future<Boolean> add_task(Question question, int time){
+	public Future<Boolean> add_task(Question question){
 		return this.exec_service.submit(new Callable<Boolean>(){
 			@Override
-			public Boolean call() throws Exception{
-				question_type_b_list.put(question);
+			public Boolean call(){
+				try{
+					question_type_b_list.put(question);
 
-				synchronized(monitor){
-					monitor.wait();
+					synchronized(monitor){
+						monitor.wait();
+					}
+				} catch(InterruptedException int_e){
+					int_e.printStackTrace();
 				}
 
 				return question.check_answer();
