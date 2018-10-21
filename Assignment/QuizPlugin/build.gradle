@@ -1,4 +1,3 @@
 dependencies{
 	compile project(':MultiChoice')
-	compile project(':ShortAnswer')
 }
