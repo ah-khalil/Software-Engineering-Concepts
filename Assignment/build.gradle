@@ -1,6 +1,11 @@
 subprojects{
 	apply plugin: 'java'
 
+	tasks.withType(JavaCompile) {
+    	options.compilerArgs << '-Xlint:unchecked'
+    	options.deprecation = true
+	}
+
 	repositories{
 		jcenter()
 	}

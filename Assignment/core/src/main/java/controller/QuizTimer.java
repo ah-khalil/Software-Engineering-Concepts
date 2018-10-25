@@ -8,27 +8,34 @@ import javax.swing.SwingUtilities;
 
 public class QuizTimer{
 	private Timer timer;
+	private int current_time;
+	private int current_limit;
 	private QuizWindow quiz_w;
 
-	public QuizTimer(){
-		timer = new Timer();
-	}
-
 	public void countdown(int time){
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
-				Timer time = new Timer();
+		this.timer = new Timer();
+		this.current_time = time;
+		this.current_limit = time;
 
-				time.scheduleAtFixedRate(new TimerTask(){
-					public void run(){
-						quiz_w.update_time("Yeet");
-					}
-				}, 1000, 1);
+		timer.scheduleAtFixedRate(new TimerTask(){
+			public void run(){
+				current_time -= 1;
+
+				if(current_time >= 0)
+					quiz_w.update_time(Integer.toString(current_time));
+				else{
+					quiz_w.submit_answer();
+					cancel();
+				}
 			}
-		});
+		}, 0, 1000);
 	}
 
 	public void set_window(QuizWindow quiz_w){
 		this.quiz_w = quiz_w;
+	}
+
+	public void cancel_timer(){
+		this.timer.cancel();
 	}
 }

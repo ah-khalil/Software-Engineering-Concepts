@@ -10,7 +10,12 @@ public class QuizPlugin extends Quiz{
 		super(quiz_controller);
 	}
 
+	/**
+	 * @param plug_loader
+	 */
 	public void run_quiz(PluginLoader plug_loader){
+		TerminalQuestion terminal_q = new TerminalQuestion(this.quiz_controller);
+
 		MultiChoiceQuestion mc_q, mc_q_two, mc_q_three;
 		ShortAnswerQuestion sh_q, sh_q_two, sh_q_three;
 
@@ -65,10 +70,26 @@ public class QuizPlugin extends Quiz{
 				"Donald Trump"
 			);
 
-			mc_q_result = mc_q.invoke(10);
-			mc_q_two_result = mc_q_two.invoke(1);
-			mc_q_three_result = mc_q_three.invoke(1);
-			sh_q_result = sh_q.invoke(1);
+			sh_q_two = shortanswer_plugin.create_shortanswer(
+				"How many bullet catridges does the CSAA have?",
+				"Six"
+			);
+
+			sh_q_three = shortanswer_plugin.create_shortanswer(
+				"How many milligrams of sodium in a 600ml bottle of Coke Zero?",
+				"25mg"
+			);
+
+			mc_q_result = mc_q.invoke(100);
+			mc_q_two_result = mc_q_two.invoke(100);
+			mc_q_three_result = mc_q_three.invoke(100);
+			sh_q_result = sh_q.invoke(100);
+
+			if(mc_q_two_result.get())
+				sh_q_three_result = sh_q_three.invoke();
+
+			if(sh_q_result.get())
+				sh_q_two_result = sh_q_two.invoke(100);
 
 			if(!mc_q_result.get()){
 				System.out.println("You just got yote!");
@@ -76,7 +97,7 @@ public class QuizPlugin extends Quiz{
 				System.out.println("You have yote on the question");
 			}
 
-			// this.quiz_controller.end_of_question();
+			terminal_q.invoke();
 		} catch(InstantiationException inst_e){
 			inst_e.printStackTrace();
 		}  catch(IllegalAccessException il_a_e){

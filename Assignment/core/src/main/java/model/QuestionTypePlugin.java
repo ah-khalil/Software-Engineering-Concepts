@@ -10,5 +10,5 @@ public abstract class QuestionTypePlugin{
 
 	public void set_controller(QuizController quiz_controller){
 		this.quiz_controller = quiz_controller;
-	}	
+	}
 }

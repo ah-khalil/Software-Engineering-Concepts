@@ -17,6 +17,10 @@ public class ShortAnswerQuestion extends Question{
 		this.actual_answer = answer;
 	}
 
+	public String get_question(){
+		return this.question_label.getText();
+	}
+
 	public Boolean check_answer(){
 		return (this.given_answer.equals(this.actual_answer));
 	}

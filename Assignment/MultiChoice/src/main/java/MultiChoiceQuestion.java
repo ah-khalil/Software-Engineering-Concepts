@@ -4,7 +4,6 @@ import controller.*;
 import java.awt.*;  
 import java.util.*;
 import javax.swing.*;
-import java.util.concurrent.Future;
 
 public class MultiChoiceQuestion extends Question{
 	private JLabel question_label;
@@ -18,6 +17,10 @@ public class MultiChoiceQuestion extends Question{
 		this.question_options_arr_list = new ArrayList<JRadioButton>();
 
 		set_radio_buttons(options, option_answer_idx);
+	}
+
+	public String get_question(){
+		return this.question_label.getText();
 	}
 
 	public Boolean check_answer(){

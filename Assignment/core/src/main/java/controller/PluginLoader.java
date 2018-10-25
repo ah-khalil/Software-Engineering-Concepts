@@ -5,7 +5,24 @@ import java.io.File;
 import java.nio.file.*;
 import java.lang.reflect.*;
 
+/**
+ * PluginLoader class is used to load a series of classes from a given directory.
+ * It is an extension of ClassLoader, utilizing the class's defineClass() method
+ * to generate a class object of the loaded-in class.
+ * 
+ * @author Ali Khalil
+ */
 public class PluginLoader extends ClassLoader{
+	/**
+	 * Loads classes from {@code root_plugin_dir}, travelling to the build/classes/java/main subdirectories to
+	 * find the class files. It converts the class files into a byte array and uses ClassLoader's defineClass()
+	 * method to return a Class object. 
+	 * While the classes have been loaded, the return of this method is the Class object that inherits from either
+	 * Quiz or QuestionTypePlugin.
+	 * 
+	 * @param root_plugin_dir	the name (case sensitive) of the plugin's root directory
+	 * @return 					Class object of the class that either inherits from Quiz or QuestionTypePlugin
+	 */
 	public Class load(String root_plugin_dir){
 		Path cl_path;
 		File cl_file;
@@ -16,7 +33,7 @@ public class PluginLoader extends ClassLoader{
 		try{
 			quiz_cl = Class.forName("model.Quiz");
 			q_pl_cl = Class.forName("model.QuestionTypePlugin");
-			cl_path = Paths.get(root_plugin_dir, "build", "classes", "main");
+			cl_path = Paths.get(root_plugin_dir, "build", "classes", "java", "main");
 			cl_file = cl_path.toFile();
 
 			for(File file_entry : cl_file.listFiles()){
@@ -32,6 +49,6 @@ public class PluginLoader extends ClassLoader{
 
 		}
 
-		return (ret_cl != null) ? ret_cl : null;
+		return ret_cl;
 	}
 }
