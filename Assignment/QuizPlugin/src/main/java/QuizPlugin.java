@@ -3,17 +3,28 @@ import controller.*;
 import java.nio.file.*;
 import java.lang.reflect.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 import java.nio.file.attribute.BasicFileAttributes;
 
+/**
+ * QuizPlugin loades the classes needed and then generates the plugins needed to make Questions.
+ * It then invokes them to allow the user to answer them.
+ * Some Questions may be invoked depending on the the correctness of the previous answers.
+ */
 public class QuizPlugin extends Quiz{
 	public QuizPlugin(QuizController quiz_controller){
 		super(quiz_controller);
 	}
 
 	/**
+	 * Implements the run_quiz() method in the Quiz superclass.
+	 * Loads a series of QuestionTypePlugin classes and generates Questions out of them.
+	 * Invokes the Questions to send the to the QuizController to be added to the deque.
+	 * 
 	 * @param plug_loader
 	 */
-	public void run_quiz(PluginLoader plug_loader){
+	public void run_quiz(PluginLoader plug_loader) throws LoaderException, UnsetControllerException{
+		//Needed to signal the QuizController to stop trying to remove Questions from the deque.
 		TerminalQuestion terminal_q = new TerminalQuestion(this.quiz_controller);
 
 		MultiChoiceQuestion mc_q, mc_q_two, mc_q_three;
@@ -26,41 +37,45 @@ public class QuizPlugin extends Quiz{
 		ShortAnswer shortanswer_plugin;
 
 		try{
+			//load QuestionTypePlugins using the given PluginLoader object
 			multichoice_plugin = (MultiChoice) plug_loader.load("MultiChoice").newInstance();
 			shortanswer_plugin = (ShortAnswer) plug_loader.load("ShortAnswer").newInstance();
+
+			//need to set the plugins' controller otherwise Question creation methods will incur an Exception
 			multichoice_plugin.set_controller(this.quiz_controller);
 			shortanswer_plugin.set_controller(this.quiz_controller);
 
+			//creating a MultiChoice Question
 			mc_q = multichoice_plugin.create_multichoice(
-				"Which one of these is trash?",
+				"When was the United States Declaration of Independence ratified?",
 				new String[]{
-					"Anime",
-					"Avatar",
-					"Ass",
-					"Aloe Vera"
+					"1776",
+					"1786",
+					"1756",
+					"1774"
 				},
 				0
 			);
 
 			mc_q_two = multichoice_plugin.create_multichoice(
-				"In which American state is the Milly Rock performed?",
+				"Who is the monarch of Australia?",
 				new String[]{
-					"New York",
-					"Arkansas",
-					"Florida",
-					"California",
-					"New Jersey"
+					"Queen Elizabeth II",
+					"King Joffrey, the First of His Name",
+					"John Howard",
+					"Tracer, from Overwatch",
+					"Bill Gates"
 				},
 				0
 			);
 
 			mc_q_three = multichoice_plugin.create_multichoice(
-				"Which video game character has a recurring role in the Fox cartoon, Family Guy?",
+				"Which video game series revolves around a secret agent with an animal codename?",
 				new String[]{
-					"Dante, from Devil May Cry",
-					"Mario, from Super Mario",
-					"Sans, from Undertale",
-					"Lara Croft, from Tomb Raider"
+					"Devil May Cry",
+					"Super Mario",
+					"Metal Gear Solid",
+					"Tomb Raider"
 				},
 				2
 			);
@@ -80,32 +95,26 @@ public class QuizPlugin extends Quiz{
 				"25mg"
 			);
 
+			//invocation of the Questions with a time limit of 100 seconds
 			mc_q_result = mc_q.invoke(100);
 			mc_q_two_result = mc_q_two.invoke(100);
 			mc_q_three_result = mc_q_three.invoke(100);
 			sh_q_result = sh_q.invoke(100);
 
+			//invocation of sh_q_three only if mc_q_two was answered correctly
 			if(mc_q_two_result.get())
 				sh_q_three_result = sh_q_three.invoke();
 
 			if(sh_q_result.get())
 				sh_q_two_result = sh_q_two.invoke(100);
 
-			if(!mc_q_result.get()){
-				System.out.println("You just got yote!");
-			} else {
-				System.out.println("You have yote on the question");
-			}
-
+			//MUST call TerminalQuestion invoke() to stop QuizController trying to remove
+			//Questions from deque.
 			terminal_q.invoke();
-		} catch(InstantiationException inst_e){
-			inst_e.printStackTrace();
-		}  catch(IllegalAccessException il_a_e){
-			il_a_e.printStackTrace();
-		} catch(Exception e){
-			e.printStackTrace();
-		} finally{
-
-		}
+		} catch(InstantiationException | IllegalAccessException i_e){
+			throw new LoaderException("Unable to load and run class");
+		} catch(InterruptedException int_e){
+			//Let the thread be interrupted
+		} catch(ExecutionException e_e){}
 	}
 }

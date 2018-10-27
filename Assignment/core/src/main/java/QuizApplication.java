@@ -21,21 +21,21 @@ public class QuizApplication{
 		QuizController test_control;
 		Class<?> plugin_cl, loader_cl, control_cl;
 		Object plugin, submit_monitor, next_monitor;
-		LinkedBlockingDeque<Question> question_type_b_list;
+
+		SystemPrinter system_print = new SystemPrinter();
 
 		/*Used for debugging purposes*/
 		Method[] pl_method_arr;
 
         try{
+        	next_monitor = new Object();
+			submit_monitor = new Object();
+			q_w = new QuizWindow(submit_monitor, next_monitor);
+			test_control = new QuizController(submit_monitor, next_monitor, q_w);
+
 			if(args.length < 1){
 				System.out.println("There isn't any quiz plugin: nothing is gonna be displayed. Soz!");		
 			} else {
-				next_monitor = new Object();
-				submit_monitor = new Object();
-				question_type_b_list = new LinkedBlockingDeque<Question>();
-				q_w = new QuizWindow(submit_monitor, next_monitor);
-				test_control = new QuizController(question_type_b_list, submit_monitor, next_monitor, q_w);
-
 				loader = new PluginLoader();
 				plugin_cl = loader.load(args[0]);
 				loader_cl = Class.forName("controller.PluginLoader");
@@ -45,32 +45,19 @@ public class QuizApplication{
 				pl_method_arr = plugin_cl.getMethods();
 				pl_method = plugin_cl.getMethod("run_quiz", loader_cl);
 				pl_method.invoke(plugin, loader);
-
-				// System.out.println("Plugin Class Name: " + plugin.getClass());
-				// System.out.println("Plugin Class Constructors: " + Arrays.toString(plugin_cl.getConstructors()));
-				// System.out.println("Constructor Name: " + constr.getName());
-				// System.out.println("Method Name: " + pl_method.getName());
-
-				// Thread thread = new Thread(new Runnable(){
-				// 	public void run(){
-				// 		try{
-				// 		} catch(IllegalAccessException ia_e){
-				// 			ia_e.printStackTrace();
-				// 		} catch(InvocationTargetException inv_t_e){
-				// 			inv_t_e.printStackTrace();
-				// 		}
-				// 	}
-				// });
-
-				// thread.start();
-
-				// while(thread.isAlive()){
-				// 	System.out.println("Its Dat Boi!");
-				// }
 			}
-
+		} catch(LoaderException load_e){
+			system_print.print_message("ERROR: " + load_e.getMessage() + "\n");
+		} catch(ClassNotFoundException cnf_e){
+			system_print.print_message("ERROR: " + cnf_e.getMessage() + "\n");
+		} catch(NoSuchMethodException nsm_e){
+			system_print.print_message("ERROR: Please make sure there is a run_quiz() method in the QuizPlugin\n");
+		} catch(InstantiationException ins_e){
+			system_print.print_message("ERROR: " + ins_e.getMessage() + "\n");
+		} catch(IllegalAccessException ia_e){
+			system_print.print_message("ERROR: Please make sure the run_quiz() method is public, not private\n");
 		} catch(Exception e){
-			e.printStackTrace();
+			system_print.print_message("ERROR: An unknown error has occurred\n");
 		}
 	}
 }

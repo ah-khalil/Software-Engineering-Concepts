@@ -4,7 +4,6 @@ import controller.*;
 import java.awt.*;  
 import java.util.*;
 import javax.swing.*;
-import java.util.concurrent.Future;
 
 public class ShortAnswerQuestion extends Question{
 	private JLabel question_label;
@@ -15,6 +14,9 @@ public class ShortAnswerQuestion extends Question{
 		this.question_label = new JLabel(question);
 		this.answer_text_field = new JTextArea();
 		this.actual_answer = answer;
+
+		//always best to give given_answer a default value in case it was not answered
+		this.given_answer = "";
 	}
 
 	public String get_question(){

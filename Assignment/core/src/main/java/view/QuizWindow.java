@@ -28,6 +28,10 @@ public class QuizWindow{
         init_window();
     }
 
+    /**
+     * Initializes the window with the basic button and panel layout
+     * Calls other initialization functions
+     */
     private void init_window(){
         Container pane;
         JPanel number_keep_panel;
@@ -47,6 +51,9 @@ public class QuizWindow{
         window.setVisible(true);
     }
 
+    /**
+     * Initializes the QuizWindow's panels
+     */
     private void init_panes(){
     	this.timer_pane = new JPanel(new FlowLayout());
         this.score_pane = new JPanel(new FlowLayout());
@@ -69,6 +76,9 @@ public class QuizWindow{
         this.results_pane.setMinimumSize(this.results_pane.getPreferredSize());
     }
 
+    /**
+     * Initializes the QuizWindow's buttons
+     */
     private void init_buttons(){
     	this.quit_b = new JButton("Quit");
         this.submit_b = new JButton("Submit");
@@ -82,6 +92,7 @@ public class QuizWindow{
         this.button_row_pane.add(this.reload_b);
         this.button_row_pane.add(this.restart_b);
 
+        //Close window when Quit button is pressed
         this.quit_b.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -89,6 +100,7 @@ public class QuizWindow{
             }
         });
 
+        //Submit the answer when Submit is pressed
         this.submit_b.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -96,20 +108,25 @@ public class QuizWindow{
             }
         });
 
-       this.next_b.addActionListener(new ActionListener(){
+        //Clear question and notify QuizController to continue to remove questions
+        //from the deque
+        this.next_b.addActionListener(new ActionListener(){
         	@Override
         	public void actionPerformed(ActionEvent e){
         		clear_current_question();
 
                 synchronized(next_monitor){
-                    System.out.println("\n\nNotifying....");
                     next_monitor.notify();
-                    System.out.println("Notified\n\n");
                 }
         	}
         });
     }
 
+    /**
+     * Stops the timer and submits the answer given to the Question.
+     * Print to the window whether or not the answer was correct.
+     * Notify the QuizController that Question was answered.
+     */
     public void submit_answer(){
         this.quiz_timer.cancel_timer();
         this.current_question.submit();
@@ -126,9 +143,16 @@ public class QuizWindow{
         }
     }
 
+    /**
+     * Update the time remaining in the window
+     * @param time time remaining to answer the Question
+     */
     public void update_time(String time){
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){
+                //As removeAll() will error if there is nothing
+                //in the panel to begin, check if there is something
+                //there.
                 if(timer_pane.getComponents().length > 0)
                     timer_pane.removeAll();
 
@@ -138,6 +162,11 @@ public class QuizWindow{
         });
     }
 
+    /**
+     * Update the score accumulated and total Questions answered in the window
+     * @param score total score
+     * @param total total Questions answered
+     */
     public void update_score(String score, String total){
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){
@@ -183,6 +212,9 @@ public class QuizWindow{
         });
     }
 
+    /**
+     * Clear the window for new Question
+     */
     private void clear_current_question(){
         this.question_pane.removeAll();
         this.results_pane.removeAll();
@@ -190,37 +222,35 @@ public class QuizWindow{
         this.window.pack();
     }
 
-    private void clear_screen(){
-
-    }
-
+    /**
+     * Use the current and next Questions to update and display the user interface
+     * so that the user can answer the Question.
+     * Starts a countdown with the QuizTimer if the Question's time limit is > 0.
+     */
     public void display_question(){
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){
                 int question_time_limit;
                 Container content_pane = window.getContentPane();
 
-                System.out.println("Using Current Question: " + current_question.get_question());
-                System.out.println("Using Next Question: " + next_question.get_question());
+                question_pane.add(current_question.get_ui_elements(), BorderLayout.PAGE_START);
+                question_pane.add(new JLabel("Next Question: " + next_question.get_question()), BorderLayout.PAGE_END);
+                content_pane.add(question_pane, BorderLayout.CENTER);
+                question_time_limit = current_question.get_time_limit();
 
-                try{
-                    question_pane.add(current_question.get_ui_elements(), BorderLayout.PAGE_START);
-                    question_pane.add(new JLabel("Next Question: " + next_question.get_question()), BorderLayout.PAGE_END);
-                    content_pane.add(question_pane, BorderLayout.CENTER);
-                    question_time_limit = current_question.get_time_limit();
+                if(question_time_limit > 0)
+                    quiz_timer.countdown(question_time_limit);
 
-                    if(question_time_limit > 0)
-                        quiz_timer.countdown(question_time_limit);
-
-                    window.pack();
-
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
+                window.pack();
             }
         });
     }
 
+    /**
+     * Display the final score
+     * @param score total number of Questions answered correctly
+     * @param total total number of Questions
+     */
     public void display_final(String score, String total){
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){
@@ -230,6 +260,9 @@ public class QuizWindow{
         });
     }
 
+    /**
+     * Close the window. Used when the Quit button is clicked.
+     */
     private void close_window(){
         this.window.dispatchEvent(new WindowEvent(this.window, WindowEvent.WINDOW_CLOSING));
     }

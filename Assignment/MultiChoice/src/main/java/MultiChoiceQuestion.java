@@ -11,6 +11,12 @@ public class MultiChoiceQuestion extends Question{
 	private JRadioButton given_answer, actual_answer;
 	private ArrayList<JRadioButton> question_options_arr_list;
 
+	/**
+	 * Constructor for MultiChoiceQuestion
+	 * @param  q_label           the label of the Question
+	 * @param  options           the options for the Question
+	 * @param  option_answer_idx the index of {@code options} where the answer lies
+	 */
 	public MultiChoiceQuestion(String q_label, String[] options, int option_answer_idx){
 		this.button_group = new ButtonGroup();
 		this.question_label = new JLabel(q_label);
@@ -47,15 +53,24 @@ public class MultiChoiceQuestion extends Question{
 		}
 	}
 
-	private void set_radio_buttons(String[] options, int option_answer_idx){
-		if(option_answer_idx > options.length - 1){
+	/**
+	 * Initializes the JRadioButtons by assigning them the option labels given.
+	 * Sets the answer to the question based on the array index given.
+	 * @param options           		the option labels to assign to the JRadioButtons
+	 * @param option_answer_idx 		the index wherein the answer lays inside the options string array
+	 * @throws IllegalArgumentException if the answer index is greater or less than the length of the option array
+	 */
+	private void set_radio_buttons(String[] options, int option_answer_idx) throws IllegalArgumentException{
+		if(option_answer_idx > options.length - 1 || option_answer_idx < 0){
 			throw new IllegalArgumentException("Option answer index given is greater than total array length (Arrays are 0-based)");
 		}
 
+		//iterate through the options array and create a JRadioButton for each option
 		for(int i = 0; i < options.length; i++){
 			this.question_options_arr_list.add(new JRadioButton(options[i]));
 			this.button_group.add(this.question_options_arr_list.get(i));
 
+			//if the current question is at the index stated in option_answer_idx, set the Question answer to be that
 			if(option_answer_idx == i)
 				this.actual_answer = this.question_options_arr_list.get(i);
 
